@@ -10,6 +10,11 @@ import {
   type AgentSession,
 } from "@mariozechner/pi-coding-agent";
 
+import { type LabAudioItem } from "@/server/pi/audio-store";
+import {
+  synthesizeSpeechTool,
+  type SynthesizeSpeechToolDetails,
+} from "@/server/pi/kokoro";
 import {
   ensureDataDirectories,
   ensureSessionPaths,
@@ -33,6 +38,7 @@ You are embedded in Pi Listening Lab.
 - Stay open-ended and conversational. Offer options and examples when useful.
 - Do not force a fixed lesson plan or workflow unless the user explicitly asks for one.
 - You still have your default pi coding tools. Use them only when they genuinely help the user's request.
+- You can synthesize speech for selected text when the user explicitly wants to hear it. Do not generate audio unless the user asks for playback or listening material.
 - Your working directory is an isolated per-session workspace for scratch notes and generated artifacts.`;
 
 const NO_MODEL_MESSAGE =
@@ -73,6 +79,7 @@ export interface LabSessionResponse {
     chatResponseShape: {
       sessionId: "string";
       assistantText: "string";
+      audioItems: "array";
       meta: "object";
     };
   };
@@ -81,6 +88,7 @@ export interface LabSessionResponse {
 export interface LabChatResponse {
   sessionId: string;
   assistantText: string;
+  audioItems: LabAudioItem[];
   meta: {
     piSessionId: string;
     model: ModelSummary | null;
@@ -146,6 +154,7 @@ class LabSessionStore {
       resourceLoader,
       sessionManager: SessionManager.create(paths.workspaceDir, paths.recordsDir),
       tools: createCodingTools(paths.workspaceDir),
+      customTools: [synthesizeSpeechTool],
     });
     const now = new Date().toISOString();
 
@@ -235,6 +244,7 @@ class LabSessionStore {
         chatResponseShape: {
           sessionId: "string",
           assistantText: "string",
+          audioItems: "array",
           meta: "object",
         },
       },
@@ -270,6 +280,7 @@ class LabSessionStore {
     await this.ensureSessionModel(record);
 
     let assistantText = "";
+    const audioItems = new Map<string, LabAudioItem>();
     let toolCalls = 0;
     const startedAt = performance.now();
     const unsubscribe = record.session.subscribe((event) => {
@@ -282,6 +293,14 @@ class LabSessionStore {
 
       if (event.type === "tool_execution_start") {
         toolCalls += 1;
+      }
+
+      if (event.type === "tool_execution_end" && !event.isError) {
+        const audioItem = extractAudioItemFromToolResult(event.toolName, event.result);
+
+        if (audioItem) {
+          audioItems.set(audioItem.id, audioItem);
+        }
       }
     });
 
@@ -317,6 +336,7 @@ class LabSessionStore {
       assistantText:
         finalAssistantText ||
         "The pi agent finished the turn without returning assistant text.",
+      audioItems: [...audioItems.values()],
       meta: {
         piSessionId: record.session.sessionId,
         model: serializeModel(record.session.model),
@@ -385,6 +405,22 @@ function getLastAssistantText(messages: AgentSession["messages"]) {
   }
 
   return "";
+}
+
+function extractAudioItemFromToolResult(toolName: string, result: unknown) {
+  if (toolName !== synthesizeSpeechTool.name || !result || typeof result !== "object") {
+    return null;
+  }
+
+  const details =
+    "details" in result ? (result.details as SynthesizeSpeechToolDetails | undefined) : undefined;
+  const audioItem = details?.audioItem;
+
+  if (!audioItem) {
+    return null;
+  }
+
+  return audioItem;
 }
 
 export async function createLabSession() {

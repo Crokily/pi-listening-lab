@@ -35,17 +35,17 @@ export default function Home() {
         <section className="grid gap-6 lg:grid-cols-[1.35fr_0.95fr]">
           <div className="rounded-[2rem] border border-line/80 bg-surface-strong px-7 py-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur">
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-accent">
-              Ralph US-001
+              Ralph US-002
             </p>
             <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
               Pi Listening Lab
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
-              This foundation story embeds a real pi agent session behind a
-              Next.js App Router backend so the product can grow into an
-              open-ended English listening workshop. The agent is oriented
-              toward scenarios, accents, pacing, role-play ideas, and corpus
-              discovery without forcing a fixed lesson flow.
+              This backend story embeds a real pi agent session behind a
+              Next.js App Router service layer and adds a Kokoro-backed speech
+              synthesis tool for learner-requested playback. The agent stays
+              open-ended around scenarios, accents, pacing, role-play ideas,
+              and corpus discovery instead of forcing a fixed lesson flow.
             </p>
             <div className="mt-8 grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
               <div className="rounded-2xl border border-line/80 bg-white/70 px-4 py-4">
@@ -55,14 +55,14 @@ export default function Home() {
                 <p className="mt-2 leading-7">
                   `POST /api/session` creates an isolated pi-backed session.
                   `POST /api/chat` sends a message to that session and returns
-                  assistant text plus simple metadata.
+                  assistant text, any new `audioItems`, and simple metadata.
                 </p>
               </div>
               <div className="rounded-2xl border border-line/80 bg-white/70 px-4 py-4">
-                <p className="font-medium text-slate-950">Deliberately deferred</p>
+                <p className="font-medium text-slate-950">Still deferred</p>
                 <p className="mt-2 leading-7">
-                  Full browser chat UX, Kokoro TTS tooling, audio storage, and
-                  playback routes belong to later Ralph stories.
+                  Full browser chat UX, voice pickers, and inline audio cards
+                  still belong to later Ralph stories.
                 </p>
               </div>
             </div>
@@ -203,9 +203,9 @@ export default function Home() {
             </h2>
             <p className="mt-4 text-sm leading-7 text-slate-700">
               The chat route accepts `{"{"} sessionId, message {"}"}` and
-              returns a minimal usable response with assistant text, model info,
-              elapsed time, and session metadata. TTS and audio routes are not
-              part of this story yet.
+              returns assistant text plus any newly generated `audioItems` from
+              the current turn. Audio binaries are served separately from
+              `/api/audio/[audioId]`.
             </p>
             <pre className="mt-5 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-xs leading-7 text-slate-100">
               <code>{curlSamples.chat}</code>

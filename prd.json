@@ -36,8 +36,8 @@
         "Typecheck / lint passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented with Codex: kept createAgentSession() with pi default coding tools, added a single Kokoro-backed synthesize_speech custom tool, stored generated audio under .data/audio with metadata, exposed /api/audio/[audioId], returned typed audioItems from /api/chat, and validated with lint, typecheck, and build."
     },
     {
       "id": "US-003",

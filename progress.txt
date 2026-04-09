@@ -17,3 +17,17 @@
   - A single-process in-memory store is sufficient for MVP, but later stories should keep the response contract structured for UI rendering and media attachments.
 ---
 
+## 2026-04-09 08:01 UTC - US-002: Pi agent and Kokoro TTS tool
+- Kept real `createAgentSession()` setup with pi's default coding tools and added exactly one custom `synthesize_speech` tool backed by Kokoro-FastAPI's OpenAI-compatible `POST /v1/audio/speech` endpoint.
+- Added server-only Kokoro config and audio persistence modules so generated files land under `.data/audio` with per-audio JSON metadata instead of `public/`.
+- Added `GET /api/audio/[audioId]` on the Node runtime to validate ids, read stored metadata, and serve audio bytes with the recorded content type.
+- Updated `/api/chat` responses to include typed `audioItems` from the current turn while keeping the contract minimal for the later UI story.
+- Refined the embedded system prompt so the pi agent knows to use speech synthesis only when the user explicitly asks to hear selected text.
+- Updated the landing page copy to reflect the new backend contract.
+- Files changed: `package.json`, `package-lock.json`, `prd.json`, `progress.txt`, `src/app/page.tsx`, `src/app/api/audio/[audioId]/route.ts`, `src/server/pi/audio-store.ts`, `src/server/pi/kokoro.ts`, `src/server/pi/paths.ts`, `src/server/pi/session-store.ts`.
+- Validation: `npm run lint`, `npm run typecheck`, and `npm run build` all passed.
+- **Follow-ups for US-003:**
+  - Render `audioItems` cards in the chat transcript and play them through the new `/api/audio/[audioId]` route.
+  - Add composer affordances for “read this aloud” requests and voice selection without forcing TTS into the default workflow.
+  - Consider surfacing tool-level Kokoro failures inline in the UI when the agent chooses synthesis and the upstream service is unavailable.
+---

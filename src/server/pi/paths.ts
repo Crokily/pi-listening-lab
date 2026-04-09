@@ -5,6 +5,7 @@ import { join, relative } from "node:path";
 
 const REPO_ROOT = process.cwd();
 const DATA_ROOT = join(REPO_ROOT, ".data");
+const AUDIO_ROOT = join(DATA_ROOT, "audio");
 const SESSIONS_ROOT = join(DATA_ROOT, "sessions");
 
 export interface SessionPaths {
@@ -17,13 +18,21 @@ export function getDataRoot() {
   return DATA_ROOT;
 }
 
+export function getAudioRoot() {
+  return AUDIO_ROOT;
+}
+
 export function toRepoRelativePath(target: string) {
   const relativePath = relative(REPO_ROOT, target);
   return relativePath === "" ? "." : relativePath;
 }
 
 export async function ensureDataDirectories() {
-  await mkdir(SESSIONS_ROOT, { recursive: true });
+  await Promise.all([
+    mkdir(DATA_ROOT, { recursive: true }),
+    mkdir(AUDIO_ROOT, { recursive: true }),
+    mkdir(SESSIONS_ROOT, { recursive: true }),
+  ]);
 }
 
 export async function ensureSessionPaths(sessionId: string): Promise<SessionPaths> {
