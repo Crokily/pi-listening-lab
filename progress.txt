@@ -45,3 +45,15 @@
   - For browser verification in dev mode, use `http://localhost:3000` rather than `127.0.0.1` to avoid Next.js dev-origin/HMR restrictions.
   - Returning `audioItems` directly from `/api/chat` keeps the UI simple and avoids a second fetch just to discover generated media.
 ---
+
+## 2026-04-09 12:20 UTC - US-004: Developer setup documentation
+- Replaced the placeholder README with developer-facing setup docs that describe the real product goal, App Router/server architecture, API routes, local run flow, and `.data` storage layout.
+- Added a tracked `.env.example` with the app's meaningful Kokoro variables plus optional host-level pi provider key examples, and updated `.gitignore` so the example file stays versioned.
+- Documented how pi model availability works on the host machine through `pi`, `/login`, `~/.pi/agent/auth.json`, `~/.pi/agent/models.json`, `PI_CODING_AGENT_DIR`, and provider environment variables rather than an app-managed auth screen.
+- Added Kokoro-FastAPI local setup notes with the current upstream Docker image examples, quick endpoint checks, and a minimal curl smoke test for the app.
+- Files changed: `.env.example`, `.gitignore`, `README.md`, `prd.json`, `progress.txt`.
+- Validation: `npm run lint`, `npm run typecheck`, and `npm run build` all passed.
+- **Learnings for future iterations:**
+  - Keep developer docs aligned with the real runtime contract, especially when auth and model selection are delegated to host tooling rather than the app UI.
+  - Track `.env.example` explicitly in `.gitignore` whenever the repo ignores `.env*`, or setup docs will drift from versioned defaults.
+---

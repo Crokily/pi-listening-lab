@@ -67,8 +67,8 @@
         "Typecheck / lint passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented with Codex: rewrote README around the actual pi-listening-lab architecture and startup flow, added a tracked .env.example for Kokoro and host-level pi model auth, documented local Kokoro-FastAPI Docker setup plus pi /login and provider-key behavior, and recorded current limitations and likely next extensions. Validated with lint, typecheck, and build."
     }
   ]
 }
