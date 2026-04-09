@@ -1,64 +1,217 @@
-import Image from "next/image";
+import { getLabBackendOverview } from "@/server/pi/session-store";
+
+export const dynamic = "force-dynamic";
+
+function formatModelLabel(
+  model:
+    | {
+        provider: string;
+        id: string;
+      }
+    | null
+    | undefined,
+) {
+  if (!model) {
+    return "No model selected";
+  }
+
+  return `${model.provider}/${model.id}`;
+}
+
+const curlSamples = {
+  createSession: `curl -X POST http://localhost:3000/api/session`,
+  chat: `curl -X POST http://localhost:3000/api/chat \\
+  -H "content-type: application/json" \\
+  -d '{"sessionId":"<session-id>","message":"Help me design a cafe conversation for intermediate listening practice."}'`,
+};
 
 export default function Home() {
+  const overview = getLabBackendOverview();
+  const previewModels = overview.environment.availableModels.slice(0, 6);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="flex flex-1">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-8 sm:px-10 lg:py-12">
+        <section className="grid gap-6 lg:grid-cols-[1.35fr_0.95fr]">
+          <div className="rounded-[2rem] border border-line/80 bg-surface-strong px-7 py-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur">
+            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-accent">
+              Ralph US-001
+            </p>
+            <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+              Pi Listening Lab
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
+              This foundation story embeds a real pi agent session behind a
+              Next.js App Router backend so the product can grow into an
+              open-ended English listening workshop. The agent is oriented
+              toward scenarios, accents, pacing, role-play ideas, and corpus
+              discovery without forcing a fixed lesson flow.
+            </p>
+            <div className="mt-8 grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
+              <div className="rounded-2xl border border-line/80 bg-white/70 px-4 py-4">
+                <p className="font-medium text-slate-950">
+                  Current backend contract
+                </p>
+                <p className="mt-2 leading-7">
+                  `POST /api/session` creates an isolated pi-backed session.
+                  `POST /api/chat` sends a message to that session and returns
+                  assistant text plus simple metadata.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-line/80 bg-white/70 px-4 py-4">
+                <p className="font-medium text-slate-950">Deliberately deferred</p>
+                <p className="mt-2 leading-7">
+                  Full browser chat UX, Kokoro TTS tooling, audio storage, and
+                  playback routes belong to later Ralph stories.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <aside className="rounded-[2rem] border border-line/80 bg-[#14213d] px-6 py-7 text-slate-100 shadow-[0_24px_80px_rgba(15,23,42,0.16)]">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-200/80">
+                  Backend Status
+                </p>
+                <p className="mt-3 text-3xl font-semibold">
+                  {overview.environment.ready ? "Ready" : "Needs model auth"}
+                </p>
+              </div>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                  overview.environment.ready
+                    ? "bg-emerald-300/20 text-emerald-100"
+                    : "bg-amber-300/20 text-amber-100"
+                }`}
+              >
+                {overview.environment.ready ? "usable" : "attention"}
+              </span>
+            </div>
+
+            <dl className="mt-8 grid gap-4 text-sm">
+              <div className="rounded-2xl border border-white/[0.12] bg-white/[0.06] px-4 py-4">
+                <dt className="text-slate-300">Preferred model</dt>
+                <dd className="mt-2 font-mono text-xs leading-6 text-slate-50">
+                  {formatModelLabel(overview.environment.preferredModel)}
+                </dd>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/[0.12] bg-white/[0.06] px-4 py-4">
+                  <dt className="text-slate-300">Configured models</dt>
+                  <dd className="mt-2 text-2xl font-semibold text-slate-50">
+                    {overview.environment.availableModelCount}
+                  </dd>
+                </div>
+                <div className="rounded-2xl border border-white/[0.12] bg-white/[0.06] px-4 py-4">
+                  <dt className="text-slate-300">Active sessions</dt>
+                  <dd className="mt-2 text-2xl font-semibold text-slate-50">
+                    {overview.activeSessions}
+                  </dd>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-white/[0.12] bg-white/[0.06] px-4 py-4">
+                <dt className="text-slate-300">Data root</dt>
+                <dd className="mt-2 font-mono text-xs leading-6 text-slate-50">
+                  {overview.dataRootPath}
+                </dd>
+              </div>
+            </dl>
+
+            <div className="mt-6">
+              <p className="text-sm font-medium text-slate-50">
+                Model discovery preview
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {previewModels.length > 0 ? (
+                  previewModels.map((model) => (
+                    <span
+                      key={`${model.provider}/${model.id}`}
+                      className="rounded-full border border-white/[0.14] bg-white/[0.08] px-3 py-1 font-mono text-[11px] text-slate-100"
+                    >
+                      {model.provider}/{model.id}
+                    </span>
+                  ))
+                ) : (
+                  <span className="rounded-full border border-amber-200/[0.25] bg-amber-300/[0.1] px-3 py-1 text-[11px] text-amber-100">
+                    No authenticated pi model available yet.
+                  </span>
+                )}
+              </div>
+              {overview.environment.warning ? (
+                <p className="mt-4 text-sm leading-7 text-amber-100/90">
+                  {overview.environment.warning}
+                </p>
+              ) : null}
+            </div>
+          </aside>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              label: "Session isolation",
+              value: ".data/sessions/<sessionId>/workspace",
+              copy: "Each browser session gets its own repo-local workspace and record directory so the embedded pi tools do not operate in the app source tree by default.",
+            },
+            {
+              label: "Store model",
+              value: "Single-process global map",
+              copy: "The server keeps pi AgentSession instances in memory and can retrieve them by API session id for continued conversation turns.",
+            },
+            {
+              label: "Route runtime",
+              value: "Node.js route handlers",
+              copy: "Both API endpoints run on the Node runtime and keep pi SDK code in server-only modules to avoid Edge and bundling issues.",
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="rounded-[1.6rem] border border-line/80 bg-surface px-5 py-5 shadow-[0_14px_50px_rgba(15,23,42,0.06)] backdrop-blur"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+              <p className="text-sm font-semibold text-slate-950">{item.label}</p>
+              <p className="mt-3 font-mono text-xs text-accent">{item.value}</p>
+              <p className="mt-4 text-sm leading-7 text-slate-700">{item.copy}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <article className="rounded-[1.8rem] border border-line/80 bg-surface-strong px-6 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
+              POST /api/session
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">
+              Create a pi-backed conversation
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-slate-700">
+              The session route creates a new in-memory store entry, prepares a
+              repo-local workspace under `.data`, initializes a real pi
+              `AgentSession`, and returns ids plus backend metadata.
+            </p>
+            <pre className="mt-5 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-xs leading-7 text-slate-100">
+              <code>{curlSamples.createSession}</code>
+            </pre>
+          </article>
+
+          <article className="rounded-[1.8rem] border border-line/80 bg-surface-strong px-6 py-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
+              POST /api/chat
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">
+              Send an open-ended listening prompt
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-slate-700">
+              The chat route accepts `{"{"} sessionId, message {"}"}` and
+              returns a minimal usable response with assistant text, model info,
+              elapsed time, and session metadata. TTS and audio routes are not
+              part of this story yet.
+            </p>
+            <pre className="mt-5 overflow-x-auto rounded-2xl bg-slate-950 px-4 py-4 text-xs leading-7 text-slate-100">
+              <code>{curlSamples.chat}</code>
+            </pre>
+          </article>
+        </section>
       </main>
     </div>
   );

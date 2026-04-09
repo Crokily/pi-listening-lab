@@ -1,0 +1,74 @@
+{
+  "project": "Pi Listening Lab",
+  "branchName": "ralph/pi-listening-lab",
+  "description": "A Next.js website that embeds a pi agent for open-ended English listening corpus design and adds a Kokoro-FastAPI TTS tool for in-browser playback.",
+  "qualityChecks": {
+    "typecheck": "npm run typecheck",
+    "lint": "npm run lint",
+    "build": "npm run build"
+  },
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Project foundation and session skeleton",
+      "description": "As a learner, I want a stable web app foundation and a persistent pi conversation session, so that I can start talking to the agent immediately.",
+      "acceptanceCriteria": [
+        "Next.js App Router project has base metadata, shell UI, and required dependencies",
+        "Server-side session creation allocates a unique sessionId and isolated workspace",
+        "Create-session and chat API skeletons return usable responses",
+        "Session workspace and app data directories are isolated for the agent",
+        "Typecheck / lint passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Implemented with Codex: added pi SDK server foundation, isolated session workspaces, Node route handlers for session/chat, and a homepage status shell. Validated with lint, typecheck, and build."
+    },
+    {
+      "id": "US-002",
+      "title": "Pi agent and Kokoro TTS tool",
+      "description": "As a learner, I want the embedded pi agent to synthesize selected corpus into speech, so that I can practice listening directly in the website.",
+      "acceptanceCriteria": [
+        "Server uses createAgentSession() and keeps pi default coding tools",
+        "A synthesize_speech custom tool calls Kokoro-FastAPI speech endpoint",
+        "Generated audio is stored and returned with playable metadata",
+        "Chat API returns both assistant text and newly generated audio items",
+        "Kokoro configuration and request failures show friendly errors",
+        "Typecheck / lint passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Listening practice chat UI",
+      "description": "As a learner, I want an intuitive chat interface with audio cards, so that I can discuss corpus and listen to the generated material in one place.",
+      "acceptanceCriteria": [
+        "Homepage includes value proposition, chat history, composer, and loading feedback",
+        "Frontend can create a session, send messages, and render user/assistant conversation",
+        "Frontend renders agent-generated audio cards with in-browser playback",
+        "Voice selector and prompt suggestions help users start quickly",
+        "Verify in browser",
+        "Typecheck / lint passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Developer setup documentation",
+      "description": "As a developer, I want clear setup documentation, so that I can run the site with pi auth and Kokoro-FastAPI quickly.",
+      "acceptanceCriteria": [
+        "README explains project goal, stack, env vars, and startup steps",
+        "A .env.example documents pi and Kokoro configuration",
+        "Local Kokoro-FastAPI integration guidance includes a docker example",
+        "Current limitations and future extensions are documented",
+        "Typecheck / lint passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

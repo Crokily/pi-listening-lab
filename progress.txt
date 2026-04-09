@@ -1,0 +1,19 @@
+## Codebase Patterns
+- Use Node.js route handlers and server-only modules for all pi SDK integration.
+- Keep generated audio under `.data/audio` and expose it through `/api/audio/[id]` instead of direct file paths.
+- Model/TTS configuration should come from env vars with safe defaults and friendly runtime errors.
+- Configure `serverExternalPackages` for pi SDK packages so Next.js does not try to bundle Node-heavy agent dependencies.
+- Create per-session workspaces under `.data/sessions/<sessionId>/workspace` and keep session records beside them for isolated pi conversations.
+
+## 2026-04-09 06:58 UTC - US-001: Project foundation and session skeleton
+- Added pi SDK dependencies, a `typecheck` script, and Next.js server external package config for `@mariozechner/pi-coding-agent`.
+- Implemented server-only pi foundation modules for environment/model discovery, repo-local data paths, and an in-memory session store backed by real `createAgentSession()` instances.
+- Added `POST /api/session` and `POST /api/chat` Node route handlers with friendly error handling and session concurrency protection.
+- Replaced the starter homepage with a product shell that documents the backend contract and environment readiness.
+- Files changed: `.gitignore`, `package.json`, `package-lock.json`, `next.config.ts`, `src/app/layout.tsx`, `src/app/globals.css`, `src/app/page.tsx`, `src/app/api/session/route.ts`, `src/app/api/chat/route.ts`, `src/server/pi/paths.ts`, `src/server/pi/services.ts`, `src/server/pi/session-store.ts`.
+- **Learnings for future iterations:**
+  - Keep pi auth/model lookup lazy and refreshable so the server can pick up `/login` changes without a reboot.
+  - Count tool executions from session events instead of trying to parse assistant text.
+  - A single-process in-memory store is sufficient for MVP, but later stories should keep the response contract structured for UI rendering and media attachments.
+---
+
