@@ -4,24 +4,17 @@ import { randomUUID } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { basename, join, relative } from "node:path";
 
+import {
+  AUDIO_FORMATS,
+  type AudioFormat,
+  type LabAudioItem,
+} from "@/lib/pi/contracts";
 import { ensureDataDirectories, getAudioRoot } from "@/server/pi/paths";
 
 export const AUDIO_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const AUDIO_FORMATS = ["mp3", "wav", "opus", "aac", "flac", "pcm"] as const;
-
-export type AudioFormat = (typeof AUDIO_FORMATS)[number];
-
-export interface LabAudioItem {
-  id: string;
-  url: string;
-  text: string;
-  voice: string;
-  format: AudioFormat;
-  createdAt: string;
-  durationMs: number | null;
-}
+export type { AudioFormat, LabAudioItem } from "@/lib/pi/contracts";
 
 export interface StoredAudioMetadata extends LabAudioItem {
   byteLength: number;

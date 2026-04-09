@@ -52,8 +52,8 @@
         "Typecheck / lint passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented with Codex: replaced the placeholder shell with a full chat UI, session creation, typed browser API client, starter prompts, optional voice hints, and audio cards with in-browser playback. Verified in browser against the local dev app, including a real pi chat turn and rendered audio card playback via /api/audio/[audioId]."
     },
     {
       "id": "US-004",

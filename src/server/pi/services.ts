@@ -2,6 +2,11 @@ import "server-only";
 
 import { AuthStorage, ModelRegistry } from "@mariozechner/pi-coding-agent";
 
+import type {
+  ModelSummary,
+  PiEnvironmentStatus,
+} from "@/lib/pi/contracts";
+
 type ToolCapableModel = {
   provider: string;
   id: string;
@@ -17,23 +22,7 @@ interface PiServices {
   modelRegistry: ModelRegistry;
 }
 
-export interface ModelSummary {
-  provider: string;
-  id: string;
-  name: string;
-  reasoning: boolean;
-  input: string[];
-  contextWindow: number;
-  maxTokens: number;
-}
-
-export interface PiEnvironmentStatus {
-  ready: boolean;
-  availableModelCount: number;
-  availableModels: ModelSummary[];
-  preferredModel: ModelSummary | null;
-  warning: string | null;
-}
+export type { ModelSummary, PiEnvironmentStatus } from "@/lib/pi/contracts";
 
 declare global {
   var __piListeningLabPiServices: PiServices | undefined;

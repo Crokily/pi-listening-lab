@@ -31,3 +31,17 @@
   - Add composer affordances for “read this aloud” requests and voice selection without forcing TTS into the default workflow.
   - Consider surfacing tool-level Kokoro failures inline in the UI when the agent chooses synthesis and the upstream service is unavailable.
 ---
+
+## 2026-04-09 12:17 UTC - US-003: Listening practice chat UI
+- Replaced the static homepage shell with a real client chat experience that auto-creates sessions, sends chat turns, shows loading/error states, and renders user/assistant transcript items.
+- Added polished `audioItems` cards with inline `<audio controls>` playback, plus optional voice hints and starter prompts that help users start quickly without forcing any workflow.
+- Moved browser-safe shared contracts into `src/lib/pi/contracts.ts` and added a typed frontend API client in `src/lib/pi/browser-client.ts` so the chat UI can stay strongly typed without importing server-only modules.
+- Refined layout and global styles so the page feels like a product surface rather than a backend demo.
+- Browser verification: opened the local app, confirmed session creation, sent a real prompt requesting spoken audio, received an assistant reply plus audio card, and verified the rendered playback route and transcript state. Screenshot saved at `/tmp/pi-listening-lab-ui.png`.
+- Files changed: `src/app/page.tsx`, `src/app/_components/listening-lab-chat.tsx`, `src/app/layout.tsx`, `src/app/globals.css`, `src/lib/pi/contracts.ts`, `src/lib/pi/browser-client.ts`, `src/server/pi/audio-store.ts`, `src/server/pi/services.ts`, `src/server/pi/session-store.ts`.
+- Validation: `npm run lint`, `npm run typecheck`, and `npm run build` all passed.
+- **Learnings for future iterations:**
+  - Keep server contracts shared in a frontend-safe module to avoid leaking `server-only` imports into client code.
+  - For browser verification in dev mode, use `http://localhost:3000` rather than `127.0.0.1` to avoid Next.js dev-origin/HMR restrictions.
+  - Returning `audioItems` directly from `/api/chat` keeps the UI simple and avoids a second fetch just to discover generated media.
+---

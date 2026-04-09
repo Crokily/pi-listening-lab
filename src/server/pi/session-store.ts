@@ -10,7 +10,12 @@ import {
   type AgentSession,
 } from "@mariozechner/pi-coding-agent";
 
-import { type LabAudioItem } from "@/server/pi/audio-store";
+import type {
+  LabAudioItem,
+  LabBackendOverview,
+  LabChatResponse,
+  LabSessionResponse,
+} from "@/lib/pi/contracts";
 import {
   synthesizeSpeechTool,
   type SynthesizeSpeechToolDetails,
@@ -27,7 +32,6 @@ import {
   pickPreferredModel,
   refreshPiServices,
   serializeModel,
-  type ModelSummary,
   type PiEnvironmentStatus,
 } from "@/server/pi/services";
 
@@ -52,59 +56,6 @@ interface SessionRecord {
   session: AgentSession;
   modelWarning: string | null;
   pendingTurn: Promise<LabChatResponse> | null;
-}
-
-export interface LabSessionResponse {
-  sessionId: string;
-  piSessionId: string;
-  createdAt: string;
-  updatedAt: string;
-  workspacePath: string;
-  recordsPath: string;
-  sessionFilePath: string | null;
-  agent: {
-    ready: boolean;
-    currentModel: ModelSummary | null;
-    preferredModel: ModelSummary | null;
-    availableModelCount: number;
-    warning: string | null;
-  };
-  api: {
-    createSession: string;
-    chat: string;
-    chatRequestShape: {
-      sessionId: "string";
-      message: "string";
-    };
-    chatResponseShape: {
-      sessionId: "string";
-      assistantText: "string";
-      audioItems: "array";
-      meta: "object";
-    };
-  };
-}
-
-export interface LabChatResponse {
-  sessionId: string;
-  assistantText: string;
-  audioItems: LabAudioItem[];
-  meta: {
-    piSessionId: string;
-    model: ModelSummary | null;
-    elapsedMs: number;
-    toolCalls: number;
-    messageCount: number;
-    updatedAt: string;
-    workspacePath: string;
-    sessionFilePath: string | null;
-  };
-}
-
-export interface LabBackendOverview {
-  activeSessions: number;
-  dataRootPath: string;
-  environment: PiEnvironmentStatus;
 }
 
 export class SessionNotFoundError extends Error {
